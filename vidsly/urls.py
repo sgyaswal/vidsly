@@ -29,7 +29,7 @@ schema_view = get_schema_view(
         contact=openapi.Contact(email="contact@snippets.local"),
         license=openapi.License(name="BSD License"),
     ),
-    url='http://13.234.20.182/',
+    url=settings.HOST,
     public=True,
     permission_classes=[permissions.AllowAny],
 )
