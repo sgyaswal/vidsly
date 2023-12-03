@@ -1,5 +1,4 @@
 asgiref==3.7.2
-backports.zoneinfo==0.2.1
 certifi==2018.10.15
 cffi==1.16.0
 chardet==3.0.4
