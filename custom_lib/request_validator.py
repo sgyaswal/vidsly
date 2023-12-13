@@ -46,24 +46,6 @@ def validate_list(lis,schema):
     return required_done,to_return
 
 
-def validate(data,service_name):
-    schema=ValidationSchema.objects.filter(service_name=service_name).values_list('required_schema',flat=True)
-    if schema:
-        schema=json.loads(schema[0])
-        dt=None
-        if type(data)==dict:
-            required_done,dt=validate_dict(data,schema)
-        elif type(data)==list:
-            required_done,dt=validate_list(data,schema)
-        else:
-            raise Exception(11016)
-        pending=list(set(schema.get("required",[]))-required_done)
-        if pending:
-            raise Exception(f"{pending[0]} is required")
-        return True,dt
-    return False,data
-
-
 import re
 list_valid={
     "datetime.strptime":"([2][0-9]{3}(-[0-9]{1,2}){2}),([2][0-9]{3}(-[0-9]{1,2}){2})",

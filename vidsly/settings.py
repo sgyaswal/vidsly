@@ -17,6 +17,24 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+import os
+
+####################### INITIALISE #######################
+envs = os.environ
+
+LOG_DELETION=envs.get('LOG_DELETION_DAY', 15)
+HOST=envs.get("HOST_SERVER_URL",'http://localhost:8000')
+DJANGO_DATABASE_NAME= envs.get('DJANGO_DATABASE_NAME', '')
+DJANGO_DATABASE_USER=  envs.get('DJANGO_DATABASE_USER', '')
+DJANGO_DATABASE_PASSWORD= envs.get('DJANGO_DATABASE_PASSWORD', '')
+DJANGO_DATABASE_SERVER=  envs.get('DJANGO_DATABASE_SERVER', '')
+
+
+AWS_SES_REGION_NAME = envs.get('AWS_SES_REGION_NAME','ap-south-1')
+AWS_ACCESS_KEY_ID = envs.get('AWS_ACCESS_KEY_ID','AKIAU7FR5STUSW7RAWNH')
+AWS_SECRET_ACCESS_KEY= envs.get('AWS_SECRET_ACCESS_KEY','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')
+AWS_SES_VERIFY_EMAIL=envs.get('AWS_SES_VERIFY_EMAIL','sgyaswal@gmail.com')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -28,12 +46,13 @@ SECRET_KEY = 'django-insecure-h9pw0u=0)8x&o=g*kjwsux!d_n1tlh-ye=yc2^%&e@#77gyu)u
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+
 CORS_ALLOW_ALL_ORIGINS = True
+
 from corsheaders.defaults import default_headers
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "Authorization",
-
     "userName", 
     "password",
 ]
@@ -50,7 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'user',
     'drf_yasg',
 ]
@@ -58,8 +77,6 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -107,46 +124,27 @@ WSGI_APPLICATION = 'vidsly.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vidsly',
-        'USER': 'uidsly',
-        'PASSWORD': 'password',
-        'HOST': 'vidsl-db.ckopx5vgcwv2.ap-south-1.rds.amazonaws.com',
+        'NAME': DJANGO_DATABASE_NAME,
+        'USER': DJANGO_DATABASE_USER,
+        'PASSWORD': DJANGO_DATABASE_PASSWORD,
+        'HOST': DJANGO_DATABASE_SERVER,
         'PORT': '3306',
         'OPTIONS': {
-            'host': 'vidsl-db.ckopx5vgcwv2.ap-south-1.rds.amazonaws.com',
+            'host': DJANGO_DATABASE_SERVER,
         },
     }
 }
 
-import os
 
-####################### INITIALISE #######################
-envs = os.environ
 
-LOG_DELETION=envs.get('LOG_DELETION_DAY', 15)
-HOST=envs.get("HOST_SERVER_URL",'http://localhost:8000')
-DJANGO_DATABASE_NAME= envs.get('DJANGO_DATABASE_NAME', '')
-DJANGO_DATABASE_USER=  envs.get('DJANGO_DATABASE_USER', '')
-DJANGO_DATABASE_PASSWORD= envs.get('DJANGO_DATABASE_PASSWORD', '')
-DJANGO_DATABASE_SERVER=  envs.get('DJANGO_DATABASE_SERVER', '')
-MONGODB_SERVER=envs.get('MONGODB_SERVER', envs.get('MONGODB_URL', ''))
-MONGODB_NAME=envs.get('MONGODB_NAME', '')
-NLP_SERVER_URL=envs.get('NLP_SERVER_URL','')
-RPA_ENGINE_URL=f"""{envs.get('RPA_ENGINE_URL','')}/hr_review"""
-LINKEDIN_USERNAME=envs.get('LINKEDIN_USERNAME','')
-LINKEDIN_PWD=envs.get('LINKEDIN_PWD','')
-SEARCH_LINKEDIN_USERNAME=envs.get('SEARCH_LINKEDIN_USERNAME','')
-SEARCH_LINKEDIN_PWD=envs.get('SEARCH_LINKEDIN_PWD','')
-SYNTHESIA_API_KEY=envs.get('SYNTHESIA_API_KEY','')
-OPENAI_API_KEY=envs.get('OPENAI_API_KEY', '')
 
 from datetime import timedelta
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",

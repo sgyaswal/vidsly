@@ -14,8 +14,8 @@ class BaseSerializer(serializers.Serializer):
 
 
 class BaseFields(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
