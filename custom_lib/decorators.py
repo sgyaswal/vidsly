@@ -1,6 +1,6 @@
 import functools
 import json
-from custom_lib.request_validator import validate
+# from custom_lib.request_validator import validate
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 import re
@@ -71,12 +71,12 @@ def swagger_auto_schema_with_case_change(**kwargs):
         return newfunc
     return inner
 
-def swagger_auto_schema_with_array_inputs_validation(**kwargs):
-    def inner(func):
-        @swagger_auto_schema(**kwargs)
-        @method_decorator(array_input_valiadtion())
-        @functools.wraps(func)  # Not required, but generally considered good practice
-        def newfunc(*args, **kwargs):
-            return func(*args, **kwargs)
-        return newfunc
-    return inner
+# def swagger_auto_schema_with_array_inputs_validation(**kwargs):
+#     def inner(func):
+#         @swagger_auto_schema(**kwargs)
+#         @method_decorator(array_input_valiadtion())
+#         @functools.wraps(func)  # Not required, but generally considered good practice
+#         def newfunc(*args, **kwargs):
+#             return func(*args, **kwargs)
+#         return newfunc
+#     return inner
