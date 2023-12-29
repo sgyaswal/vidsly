@@ -45,7 +45,7 @@ class RegistrationAPIView(generics.CreateAPIView):
         try:
             firstName = serializer.validated_data.get('first_name')
             lastName = serializer.validated_data.get('last_name')
-            username = serializer.validated_data.get('email')
+            username = serializer.validated_data.get('username')
             email = serializer.validated_data.get('email')
             password = serializer.validated_data.get('password')
 
@@ -62,7 +62,7 @@ class RegistrationAPIView(generics.CreateAPIView):
             hashedd_password = make_password(password)
 
             new_user = User.objects.create(
-                first_name=firstName, last_name=lastName, is_superuser=0, is_active=0, email=email, password=hashedd_password)
+                first_name=firstName, last_name=lastName, username= username, is_superuser=0, is_active=0, email=email, password=hashedd_password)
 
             serializer = RegistrationSerializer(new_user)
             return Response({'success': True, 'data': serializer.data}, status=status.HTTP_201_CREATED)
@@ -108,6 +108,11 @@ class LoginAPIView(generics.CreateAPIView):
 
             return Response({'success': True, 'status': status.HTTP_200_OK, 'data': {
                 'token': access_token,
+                'first_name':user.first_name,
+                'last_name':user.last_name,
+                'username':user.username,
+
+
             }})
 
         except Exception as e:
