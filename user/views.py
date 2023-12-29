@@ -347,11 +347,7 @@ class GetVideoRevenue(APIView):
 
                 def get_total_ad_earnings(video_id):
                     url = f'https://graph.facebook.com/v18.0/{video_id}/video_insights/total_video_ad_break_earnings?access_token={page_access_token}' 
-                    
-                    # data = api_call(
-                    # type="GET",  # Specify the HTTP method (GET, POST, etc.)
-                    # url=url)
-                    # data = response.json()    
+                       
                     response = requests.get(url)
                     data = response.json()
 
@@ -362,12 +358,11 @@ class GetVideoRevenue(APIView):
                     else:
                         return 0
 
-                # Check the result of the API call
                 if api_request_result["success"]:
                     api_data = api_request_result["data"]
                     latest_20_video_ids = [video["id"] for video in api_data["data"][:20]]
                     api_request_result = api_call(
-                    type="GET",  # Specify the HTTP method (GET, POST, etc.)
+                    type="GET", 
                     url=all_video_api_url)
 
                     total_sum = sum(get_total_ad_earnings(video_id) for video_id in latest_20_video_ids)
@@ -406,7 +401,7 @@ class GetLatestVideo(APIView):
                 page_id = page_info_instance.page_id
 
                 # Make an API request to a third-party endpoint using the obtained access token
-                api_url = f'https://graph.facebook.com/v18.0/{page_id}/videos?access_token={page_access_token}&fields=id,title,description,updated_time,views&limit=4'
+                api_url = f'https://graph.facebook.com/v18.0/{page_id}/videos?access_token={page_access_token}&fields=id,title,description,updated_time,views'
 
                 
                 api_request_result = api_call(
