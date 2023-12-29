@@ -170,7 +170,6 @@ class ChangePasswordAPIView(generics.UpdateAPIView):
             new_password = serializer.validated_data['new_password']
 
             user = self.request.user
-            print(user)
 
             if not check_password(old_password, user.password):
                 raise MyException("Incorrect old password",
@@ -381,6 +380,45 @@ class GetVideoRevenue(APIView):
 
             else:
                 return Response({'success': False, 'status': status.HTTP_404_NOT_FOUND, 'data': 'PageInfo not found for the user'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
+
+
+class GetLatestVideo(APIView):
+
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+    tags=['User'],
+    manual_parameters=[Authorization]
+    )
+
+    def get(self, request):
+        try:
+            user_id = request.user.id
+
+            page_info_instance = PageInfo.objects.filter(user_id=user_id).first()
+
+            if page_info_instance:
+
+                page_access_token = page_info_instance.page_access_token
+
+                page_id = page_info_instance.page_id
+
+                # Make an API request to a third-party endpoint using the obtained access token
+                api_url = f'https://graph.facebook.com/v18.0/{page_id}/videos?access_token={page_access_token}&fields=id,title,description,updated_time,views&limit=4'
+
+                
+                api_request_result = api_call(
+                    type="GET",  # Specify the HTTP method (GET, POST, etc.)
+                    url=api_url,
+                )
+            
+            if api_request_result["success"]:
+                    
+                    api_data = api_request_result["data"]["data"]
+
+                    return Response({'success': True, 'status': status.HTTP_200_OK, 'data': api_data}, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
