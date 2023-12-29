@@ -122,7 +122,7 @@ class LoginAPIView(generics.CreateAPIView):
             }})
 
         except Exception as e:
-            return Response({'error': str(e), 'status': e.status})
+            return Response({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
         
 
 class GetAllUser(APIView):
@@ -355,7 +355,7 @@ class GetVideoRevenue(APIView):
                     # data = response.json()    
                     response = requests.get(url)
                     data = response.json()
-                    
+
                     if 'data' in data:
                         total_earnings = sum(entry['values'][0]['value'] for entry in data['data'])
 
