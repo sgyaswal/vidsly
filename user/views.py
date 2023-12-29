@@ -18,6 +18,10 @@ from custom_lib.aws_utils import get_ses_client
 from django.conf import settings
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
+from .models import PageInfo
+from custom_lib.api_call import api_call
+import requests
+
 
 
 import os
@@ -239,7 +243,7 @@ class ForgotPasswordAPIView(generics.CreateAPIView):
             return Response({'success': True, 'status': status.HTTP_200_OK, 'message': 'Password reset link sent successfully.'})
 
         except Exception as e:
-            return Response({'error': str(e), 'status': e.status})
+            return Response({'error': str(e), 'status': status.HTTP_404_NOT_FOUND})
 
 
 
@@ -313,3 +317,70 @@ class UserApprovalAPIView(APIView):
 
         except MyException as e:
             return Response({'error': str(e), 'status': e.status}, status=e.status)
+        
+
+class GetVideoRevenue(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        tags=['User'],
+        manual_parameters=[Authorization]
+    )
+    def get(self, request):
+        try:
+            user_id = request.user.id
+
+            page_info_instance = PageInfo.objects.filter(user_id=user_id).first()
+
+            if page_info_instance:
+
+                page_access_token = page_info_instance.page_access_token
+
+                page_id = page_info_instance.page_id
+
+                # Make an API request to a third-party endpoint using the obtained access token
+                all_video_api_url =  f'https://graph.facebook.com/v18.0/{page_id}/videos?access_token={page_access_token}' 
+                
+                api_request_result = api_call(
+                    type="GET",  # Specify the HTTP method (GET, POST, etc.)
+                    url=all_video_api_url,
+                )
+
+                def get_total_ad_earnings(video_id):
+                    url = f'https://graph.facebook.com/v18.0/{video_id}/video_insights/total_video_ad_break_earnings?access_token={page_access_token}' 
+                    
+                    # data = api_call(
+                    # type="GET",  # Specify the HTTP method (GET, POST, etc.)
+                    # url=url)
+                    # data = response.json()    
+                    response = requests.get(url)
+                    data = response.json()
+                    
+                    if 'data' in data:
+                        total_earnings = sum(entry['values'][0]['value'] for entry in data['data'])
+
+                        return total_earnings
+                    else:
+                        return 0
+
+                # Check the result of the API call
+                if api_request_result["success"]:
+                    api_data = api_request_result["data"]
+                    latest_20_video_ids = [video["id"] for video in api_data["data"][:20]]
+                    api_request_result = api_call(
+                    type="GET",  # Specify the HTTP method (GET, POST, etc.)
+                    url=all_video_api_url)
+
+                    total_sum = sum(get_total_ad_earnings(video_id) for video_id in latest_20_video_ids)
+
+                    return Response({'success': True, 'status': status.HTTP_200_OK, 'data': {"total_earning":total_sum}}, status=status.HTTP_200_OK)
+
+                else:
+                    api_error = api_request_result["error"]
+                    return Response({'success': False, 'status': status.HTTP_500_INTERNAL_SERVER_ERROR, 'data': api_error}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            else:
+                return Response({'success': False, 'status': status.HTTP_404_NOT_FOUND, 'data': 'PageInfo not found for the user'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})

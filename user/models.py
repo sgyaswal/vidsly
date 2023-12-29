@@ -16,3 +16,14 @@ class User(BaseFields):
     class Meta:
         managed = False
         db_table = 'users'
+
+class PageInfo(BaseFields):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=255, null=False)
+    user_id  = models.IntegerField(null=False)
+    page_access_token = models.CharField(max_length=500, null=False)
+    page_id = models.CharField(max_length=255, null=False)
+
+    class Meta:
+        managed = False
+        db_table = 'page_info'
