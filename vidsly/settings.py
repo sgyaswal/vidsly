@@ -48,6 +48,21 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3030',
+# ] # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    'http://localhost:5000',
+]
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 from corsheaders.defaults import default_headers
 
@@ -55,7 +70,12 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     "Authorization",
     "userName", 
     "password",
+    'access-control-allow-origin',
+    'authorization',
+    'content-type',
 ]
+
+
 
 
 # Application definition
@@ -74,6 +94,7 @@ INSTALLED_APPS = [
     'drf_yasg',
 ]
 
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -82,12 +103,20 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    ),
 
 }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

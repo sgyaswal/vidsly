@@ -10,7 +10,7 @@ urlpatterns = [
     # path('changePassword', ChangePasswordAPIView.as_view(), name='change_password'),
     path('forgotPassword', ForgotPasswordAPIView.as_view(), name='forgot_password'),
     path('resetPassword/<str:uidb64>/<str:token>', ResetPasswordAPIView.as_view(), name='reset-password'),
-    path('userApproval/<int:user_id>/', UserApprovalAPIView.as_view(), name='user-approval'),
+    path('userApproval/<int:user_id>', UserApprovalAPIView.as_view(), name='user-approval'),
 
 
 

@@ -45,8 +45,8 @@ class RegistrationAPIView(generics.CreateAPIView):
         try:
             firstName = serializer.validated_data.get('first_name')
             lastName = serializer.validated_data.get('last_name')
+            username = serializer.validated_data.get('email')
             email = serializer.validated_data.get('email')
-            username = serializer.validated_data.get('username')
             password = serializer.validated_data.get('password')
 
             if not (username and email and password and firstName and lastName):
@@ -62,7 +62,7 @@ class RegistrationAPIView(generics.CreateAPIView):
             hashedd_password = make_password(password)
 
             new_user = User.objects.create(
-                first_name=firstName, last_name=lastName, is_superuser=0, is_active=0, username=username, email=email, password=hashedd_password)
+                first_name=firstName, last_name=lastName, is_superuser=0, is_active=0, email=email, password=hashedd_password)
 
             serializer = RegistrationSerializer(new_user)
             return Response({'success': True, 'data': serializer.data}, status=status.HTTP_201_CREATED)
@@ -111,7 +111,7 @@ class LoginAPIView(generics.CreateAPIView):
             }})
 
         except Exception as e:
-            return Response({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
+            return Response({'error': str(e), 'status': e.status})
         
 
 class GetAllUser(APIView):
@@ -129,7 +129,7 @@ class GetAllUser(APIView):
             return Response({'success': True, "status": status.HTTP_200_OK, 'data': data}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
+            return Response({'error': str(e), 'status': e.status})
 
         
         
@@ -183,7 +183,7 @@ class ChangePasswordAPIView(generics.UpdateAPIView):
             }})
 
         except Exception as e:
-            return Response({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
+            return Response({'error': str(e), 'status': e.status})
         
 
 class ForgotPasswordAPIView(generics.CreateAPIView):
@@ -232,9 +232,8 @@ class ForgotPasswordAPIView(generics.CreateAPIView):
             return Response({'success': True, 'status': status.HTTP_200_OK, 'message': 'Password reset link sent successfully.'})
 
         except Exception as e:
-            return Response({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
+            return Response({'error': str(e), 'status': e.status})
 
-  # Import your serializer
 
 
 class ResetPasswordAPIView(generics.CreateAPIView):
@@ -249,7 +248,7 @@ class ResetPasswordAPIView(generics.CreateAPIView):
             try:
                 uid = force_text(urlsafe_base64_decode(uidb64))
                 user = User.objects.get(pk=uid)
-            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            except User.DoesNotExist:
                 raise MyException("Invalid user link.", status=status.HTTP_400_BAD_REQUEST)
 
             if default_token_generator.check_token(user, token):

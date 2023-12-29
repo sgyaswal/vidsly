@@ -8,7 +8,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'is_superuser', 'is_active', 'username', 'password', 'email','date_joined']
+        fields = ['first_name', 'last_name', 'is_superuser', 'is_active', 'password', 'email','date_joined']
     
     def create(self, validated_data):
         user = User.objects.create(**validated_data)
@@ -41,14 +41,12 @@ class ForgotPasswordSerializer(serializers.Serializer):
     
 class ResetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(min_length=8, write_only=True)
-    confirm_password = serializers.CharField(min_length=8, write_only=True)
+
 
     def validate(self, data):
         new_password = data.get('new_password')
-        confirm_password = data.get('confirm_password')
 
-        if new_password != confirm_password:
-            raise serializers.ValidationError("Passwords do not match.")
+
 
         return data
 
