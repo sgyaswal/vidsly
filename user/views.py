@@ -400,7 +400,7 @@ class GetLatestVideo(APIView):
                 page_id = page_info_instance.page_id
 
                 # Make an API request to a third-party endpoint using the obtained access token
-                api_url = f'https://graph.facebook.com/v18.0/{page_id}/videos?access_token={page_access_token}&fields=id,title,description,updated_time,views'
+                api_url = f'https://graph.facebook.com/v18.0/{page_id}/videos?access_token={page_access_token}&fields=id,title,description,updated_time,views,permalink_url'
 
                 
                 api_request_result = api_call(

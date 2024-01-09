@@ -30,10 +30,10 @@ DJANGO_DATABASE_PASSWORD= envs.get('DJANGO_DATABASE_PASSWORD', '')
 DJANGO_DATABASE_SERVER=  envs.get('DJANGO_DATABASE_SERVER', '')
 
 
-AWS_SES_REGION_NAME = envs.get('AWS_SES_REGION_NAME','ap-south-1')
-AWS_ACCESS_KEY_ID = envs.get('AWS_ACCESS_KEY_ID','AKIAU7FR5STUSW7RAWNH')
-AWS_SECRET_ACCESS_KEY= envs.get('AWS_SECRET_ACCESS_KEY','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')
-AWS_SES_VERIFY_EMAIL=envs.get('AWS_SES_VERIFY_EMAIL','sgyaswal@gmail.com')
+AWS_SES_REGION_NAME = envs.get('AWS_SES_REGION_NAME','')
+AWS_ACCESS_KEY_ID = envs.get('AWS_ACCESS_KEY_ID','')
+AWS_SECRET_ACCESS_KEY= envs.get('AWS_SECRET_ACCESS_KEY','')
+AWS_SES_VERIFY_EMAIL=envs.get('AWS_SES_VERIFY_EMAIL','')
 
 
 # Quick-start development settings - unsuitable for production
@@ -43,7 +43,7 @@ AWS_SES_VERIFY_EMAIL=envs.get('AWS_SES_VERIFY_EMAIL','sgyaswal@gmail.com')
 SECRET_KEY = 'django-insecure-h9pw0u=0)8x&o=g*kjwsux!d_n1tlh-ye=yc2^%&e@#77gyu)u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
