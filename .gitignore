@@ -5,11 +5,11 @@ __pycache__/
 
 
 vnv
-# env
+env
 .vscode/
 statics
 static/js
-# *.env
+*.env
 static/*.png
 hr_review_env/
 .idea/
