@@ -27,3 +27,19 @@ class PageInfo(BaseFields):
     class Meta:
         managed = False
         db_table = 'page_info'
+
+
+class UserDetails(BaseFields):
+    id = models.BigAutoField(primary_key=True)
+    user_id  = models.IntegerField(null=False)
+    image_url = models.CharField(max_length=255)
+    category = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+    pincode = models.CharField(max_length=50)
+
+    class Meta:
+        managed = False
+        db_table = 'user_details'
