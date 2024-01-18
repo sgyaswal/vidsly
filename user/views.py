@@ -29,8 +29,13 @@ from django.utils.http import urlsafe_base64_decode
 from .models import PageInfo, UserDetails
 from custom_lib.api_call import api_call
 import requests
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
+from rest_framework.parsers import MultiPartParser, FormParser
+import boto3
+from botocore.exceptions import NoCredentialsError
+from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator, MaxValueValidator
+
+
 
 
 import os
@@ -545,3 +550,58 @@ class UpdateProfileAPIView(generics.CreateAPIView):
 
         except MyException as e:
             return Response({"error": str(e), "status": e.status}, status=e.status)
+        
+
+class UploadProfilePictureAPIView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+
+    def validate_file(self, file):
+        max_size_validator = 5 * 1024 * 1024  # 5 MB
+        allowed_extensions = ['jpg', 'jpeg', 'png']
+
+        # Validate file extension
+        file_extension = file.name.split('.')[-1].lower()
+        if file_extension not in allowed_extensions:
+            raise MyException('Invalid file type. Only JPEG, JPG, and PNG allowed.', status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate file size
+        if file.size > max_size_validator:
+            raise MyException('File size must be up to 5 MB.', status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        try:
+            user = self.request.user
+
+            profile_picture = request.FILES.get('profile_picture')
+            if not profile_picture:
+                raise MyException("Profile picture is required", status=status.HTTP_400_BAD_REQUEST)
+
+            self.validate_file(profile_picture)
+
+            # Generate a unique file name based on user information
+            file_extension = profile_picture.name.split('.')[-1]
+            folder_path = f"profile_pictures/"
+            file_name = f"{folder_path}user_id_{user.id}.{file_extension}"
+
+            # Upload the file to AWS S3 bucket
+            s3 = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+            bucket_name = settings.AWS_STORAGE_BUCKET_NAME
+            s3.upload_fileobj(profile_picture, bucket_name, file_name)
+
+            # Generate the URL for the uploaded file
+            s3_url = f"https://{bucket_name}.s3.amazonaws.com/{file_name}"
+
+            user_details = UserDetails.objects.filter(user_id=user.id)
+
+            if not user_details.exists():
+                UserDetails.objects.create(user_id=user.id, image_url=s3_url)
+            else:
+                user_details.update(image_url=s3_url)
+
+            return Response({'success': True, 'data': {'image_url': s3_url}, 'message': 'Profile picture uploaded successfully'}, status=status.HTTP_201_CREATED)
+
+        except NoCredentialsError:
+            return Response({'error':'AWS credentials not available', 'status': status.HTTP_500_INTERNAL_SERVER_ERROR}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except MyException as e:
+            return Response({'error': str(e), 'status': e.status}, status=e.status)

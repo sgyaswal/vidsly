@@ -34,6 +34,10 @@ AWS_SES_REGION_NAME = envs.get('AWS_SES_REGION_NAME','')
 AWS_ACCESS_KEY_ID = envs.get('AWS_ACCESS_KEY_ID','')
 AWS_SECRET_ACCESS_KEY= envs.get('AWS_SECRET_ACCESS_KEY','')
 AWS_SES_VERIFY_EMAIL=envs.get('AWS_SES_VERIFY_EMAIL','')
+AWS_STORAGE_BUCKET_NAME = envs.get('AWS_STORAGE_BUCKET_NAME','')
+AWS_DEFAULT_ACL = 'public-read'
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_SECURE_URLS = True
 
 
 # Quick-start development settings - unsuitable for production
