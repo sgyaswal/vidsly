@@ -36,8 +36,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator, MaxValueValidator
 
 
-
-
 import os
 
 envs = os.environ
@@ -138,7 +136,7 @@ class LoginAPIView(generics.CreateAPIView):
                     "success": True,
                     "status": status.HTTP_200_OK,
                     "data": {
-                        "user_id":user.id,
+                        "user_id": user.id,
                         "token": access_token,
                         "first_name": user.first_name,
                         "last_name": user.last_name,
@@ -425,7 +423,7 @@ class GetVideoRevenue(APIView):
 
                     page_info = PageInfo.objects.filter(user_id=user_id)
 
-                    update_data = {"facebook_earning":total_sum}
+                    update_data = {"facebook_earning": total_sum}
 
                     if not page_info.exists():
                         PageInfo.objects.create(user_id=user_id, **update_data)
@@ -527,14 +525,15 @@ class UpdateProfileAPIView(generics.CreateAPIView):
                 update_data_user["email"] = request.data["email"]
             if "password" in request.data:
                 update_data_user["password"] = make_password(request.data["password"])
-            
 
             User.objects.filter(id=user.id).update(**update_data_user)
 
             # Update data for UserDetails model
             update_data_user_details = {}
             if "mobile_number" in request.data:
-                update_data_user_details["mobile_number"] = request.data["mobile_number"]
+                update_data_user_details["mobile_number"] = request.data[
+                    "mobile_number"
+                ]
             if "address" in request.data:
                 update_data_user_details["address"] = request.data["address"]
             if "city" in request.data:
@@ -546,11 +545,9 @@ class UpdateProfileAPIView(generics.CreateAPIView):
             if "pincode" in request.data:
                 update_data_user_details["pincode"] = request.data["pincode"]
 
-
             user_details = UserDetails.objects.filter(user_id=user.id)
 
             if not user_details.exists():
-                
                 UserDetails.objects.create(user_id=user.id, **update_data_user_details)
             else:
                 user_details.update(**update_data_user_details)
@@ -562,18 +559,18 @@ class UpdateProfileAPIView(generics.CreateAPIView):
 
         except MyException as e:
             return Response({"error": str(e), "status": e.status}, status=e.status)
-        
+
+
 class GetUserDetailsAPIView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(tags=["User"], manual_parameters=[Authorization])
-
     def get(self, request):
         try:
-            user_id = request.query_params.get('user_id')
+            user_id = request.query_params.get("user_id")
 
             if not user_id:
-                raise MyException("Please Provide user Id",500)
+                raise MyException("Please Provide user Id", 500)
 
             user_data = User.objects.filter(id=user_id).first()
 
@@ -581,42 +578,41 @@ class GetUserDetailsAPIView(generics.RetrieveAPIView):
 
             user_details_data = {}
 
-            if  user_details_instance:
+            if user_details_instance:
                 user_details_data = {
-                "user_id": user_details_instance.user_id,
-                "mobile_number":user_details_instance.mobile_number,
-                "address": user_details_instance.address,
-                "city": user_details_instance.city,
-                "state": user_details_instance.state,
-                "country": user_details_instance.country,
-                "pincode": user_details_instance.pincode,
+                    "user_id": user_details_instance.user_id,
+                    "mobile_number": user_details_instance.mobile_number,
+                    "address": user_details_instance.address,
+                    "city": user_details_instance.city,
+                    "state": user_details_instance.state,
+                    "country": user_details_instance.country,
+                    "pincode": user_details_instance.pincode,
                 }
             else:
                 pass
 
             user_data = {
-                "first_name":user_data.first_name,
-                "last_name":user_data.last_name,
-                "email":user_data.email,
-                "is_superuser":user_data.is_superuser,
-                "is_staff":user_data.is_staff,
-                "is_active":user_data.is_active,
+                "first_name": user_data.first_name,
+                "last_name": user_data.last_name,
+                "email": user_data.email,
+                "is_superuser": user_data.is_superuser,
+                "is_staff": user_data.is_staff,
+                "is_active": user_data.is_active,
             }
             user_data.update(user_details_data)
 
             return Response(
-                {"success": True, "status": status.HTTP_200_OK, "data":user_data },
+                {"success": True, "status": status.HTTP_200_OK, "data": user_data},
                 status=status.HTTP_200_OK,
             )
 
         except MyException as e:
-            return Response(
-                {"error": str(e), "status": e.status}
-            )
+            return Response({"error": str(e), "status": e.status})
         except Exception as e:
             return Response(
                 {"error": str(e), "status": status.HTTP_500_INTERNAL_SERVER_ERROR}
             )
+
 
 class UploadProfilePictureAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -624,34 +620,45 @@ class UploadProfilePictureAPIView(generics.CreateAPIView):
 
     def validate_file(self, file):
         max_size_validator = 5 * 1024 * 1024  # 5 MB
-        allowed_extensions = ['jpg', 'jpeg', 'png']
+        allowed_extensions = ["jpg", "jpeg", "png"]
 
         # Validate file extension
-        file_extension = file.name.split('.')[-1].lower()
+        file_extension = file.name.split(".")[-1].lower()
         if file_extension not in allowed_extensions:
-            raise MyException('Invalid file type. Only JPEG, JPG, and PNG allowed.', status=status.HTTP_400_BAD_REQUEST)
-        
+            raise MyException(
+                "Invalid file type. Only JPEG, JPG, and PNG allowed.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         # Validate file size
         if file.size > max_size_validator:
-            raise MyException('File size must be up to 5 MB.', status=status.HTTP_400_BAD_REQUEST)
+            raise MyException(
+                "File size must be up to 5 MB.", status=status.HTTP_400_BAD_REQUEST
+            )
 
     def post(self, request):
         try:
             user = self.request.user
 
-            profile_picture = request.FILES.get('profile_picture')
+            profile_picture = request.FILES.get("profile_picture")
             if not profile_picture:
-                raise MyException("Profile picture is required", status=status.HTTP_400_BAD_REQUEST)
+                raise MyException(
+                    "Profile picture is required", status=status.HTTP_400_BAD_REQUEST
+                )
 
             self.validate_file(profile_picture)
 
             # Generate a unique file name based on user information
-            file_extension = profile_picture.name.split('.')[-1]
+            file_extension = profile_picture.name.split(".")[-1]
             folder_path = f"profile_pictures/"
             file_name = f"{folder_path}user_id_{user.id}.{file_extension}"
 
             # Upload the file to AWS S3 bucket
-            s3 = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+            s3 = boto3.client(
+                "s3",
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            )
             bucket_name = settings.AWS_STORAGE_BUCKET_NAME
             s3.upload_fileobj(profile_picture, bucket_name, file_name)
 
@@ -665,13 +672,26 @@ class UploadProfilePictureAPIView(generics.CreateAPIView):
             else:
                 user_details.update(image_url=s3_url)
 
-            return Response({'success': True, 'data': {'image_url': s3_url}, 'message': 'Profile picture uploaded successfully'}, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "success": True,
+                    "data": {"image_url": s3_url},
+                    "message": "Profile picture uploaded successfully",
+                },
+                status=status.HTTP_201_CREATED,
+            )
 
         except NoCredentialsError:
-            return Response({'error':'AWS credentials not available', 'status': status.HTTP_500_INTERNAL_SERVER_ERROR}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {
+                    "error": "AWS credentials not available",
+                    "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
         except MyException as e:
-            return Response({'error': str(e), 'status': e.status}, status=e.status)
-        
+            return Response({"error": str(e), "status": e.status}, status=e.status)
+
 
 class UpdateEarningAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -683,10 +703,10 @@ class UpdateEarningAPIView(generics.CreateAPIView):
     )
     def post(self, request):
         try:
-            user_id = request.data.get('user_id')
+            user_id = request.data.get("user_id")
 
             if not user_id:
-                raise MyException("Please Provide user Id",500)
+                raise MyException("Please Provide user Id", 500)
 
             update_data = {}
             if "page_access_token" in request.data:
@@ -702,7 +722,6 @@ class UpdateEarningAPIView(generics.CreateAPIView):
             if "youtube_earning" in request.data:
                 update_data["youtube_earning"] = request.data["youtube_earning"]
 
-
             user_details = PageInfo.objects.filter(user_id=user_id)
 
             if not user_details.exists():
@@ -717,19 +736,18 @@ class UpdateEarningAPIView(generics.CreateAPIView):
 
         except MyException as e:
             return Response({"error": str(e), "status": e.status}, status=e.status)
-        
+
 
 class GetAllEarningsAPIView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(tags=["User"], manual_parameters=[Authorization])
-
     def get(self, request):
         try:
-            user_id = request.query_params.get('user_id')
+            user_id = request.query_params.get("user_id")
 
             if not user_id:
-                raise MyException("Please Provide user Id",500)
+                raise MyException("Please Provide user Id", 500)
 
             user_data = PageInfo.objects.filter(user_id=user_id).first()
 
@@ -737,24 +755,26 @@ class GetAllEarningsAPIView(generics.RetrieveAPIView):
                 raise MyException("Page Information Not Found", 404)
 
             user_data = {
-                "page_access_token":user_data.page_access_token,
-                "page_id":user_data.page_id,
-                "youtube_earning":user_data.youtube_earning,
-                "snapchat_earning":user_data.snapchat_earning,
-                "instagram_earning":user_data.instagram_earning,
-                "facebook_earning":user_data.facebook_earning,
-                "total_earning":(int(user_data.youtube_earning)+int(user_data.facebook_earning)+int(user_data.instagram_earning))
+                "page_access_token": user_data.page_access_token,
+                "page_id": user_data.page_id,
+                "youtube_earning": user_data.youtube_earning,
+                "snapchat_earning": user_data.snapchat_earning,
+                "instagram_earning": user_data.instagram_earning,
+                "facebook_earning": user_data.facebook_earning,
+                "total_earning": (
+                    float(user_data.youtube_earning)
+                    + float(user_data.facebook_earning)
+                    + float(user_data.instagram_earning)
+                ),
             }
 
             return Response(
-                {"success": True, "status": status.HTTP_200_OK, "data":user_data },
+                {"success": True, "status": status.HTTP_200_OK, "data": user_data},
                 status=status.HTTP_200_OK,
             )
 
         except MyException as e:
-            return Response(
-                {"error": str(e), "status": e.status}
-            )
+            return Response({"error": str(e), "status": e.status})
         except Exception as e:
             return Response(
                 {"error": str(e), "status": status.HTTP_500_INTERNAL_SERVER_ERROR}
