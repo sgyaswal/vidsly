@@ -551,6 +551,56 @@ class UpdateProfileAPIView(generics.CreateAPIView):
         except MyException as e:
             return Response({"error": str(e), "status": e.status}, status=e.status)
         
+class GetUserDetailsAPIView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(tags=["User"], manual_parameters=[Authorization])
+
+    def get(self, request):
+        try:
+            user = request.user
+
+            user_data = User.objects.filter(id=user.id).first()
+
+            user_details_instance = UserDetails.objects.filter(user_id=user.id).first()
+
+            user_details_data = {}
+
+            if  user_details_instance:
+                user_details_data = {
+                "user_id": user_details_instance.user_id,
+                "address": user_details_instance.address,
+                "city": user_details_instance.city,
+                "state": user_details_instance.state,
+                "country": user_details_instance.country,
+                "pincode": user_details_instance.pincode,
+                }
+            else:
+                pass
+
+            user_data = {
+                "first_name":user_data.first_name,
+                "last_name":user_data.last_name,
+                "email":user_data.email,
+                "is_superuser":user_data.is_superuser,
+                "is_staff":user_data.is_staff,
+                "is_active":user_data.is_active,
+            }
+            user_data.update(user_details_data)
+
+            return Response(
+                {"success": True, "status": status.HTTP_200_OK, "data":user_data },
+                status=status.HTTP_200_OK,
+            )
+
+        except MyException as e:
+            return Response(
+                {"error": str(e), "status": e.status}
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e), "status": status.HTTP_500_INTERNAL_SERVER_ERROR}
+            )
 
 class UploadProfilePictureAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -648,3 +698,43 @@ class UpdateEarningAPIView(generics.CreateAPIView):
 
         except MyException as e:
             return Response({"error": str(e), "status": e.status}, status=e.status)
+        
+
+class GetAllEarningsAPIView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(tags=["User"], manual_parameters=[Authorization])
+
+    def get(self, request):
+        try:
+            user = request.user
+
+            print(user.id)
+
+            user_data = PageInfo.objects.filter(user_id=user.id).first()
+
+            if not user_data:
+                raise MyException("Page Information Not Found", 404)
+
+            user_data = {
+                "page_access_token":user_data.page_access_token,
+                "page_id":user_data.page_id,
+                "youtube_earning":user_data.youtube_earning,
+                "snapchat_earning":user_data.snapchat_earning,
+                "instagram_earning":user_data.instagram_earning,
+                "facebook_earning":user_data.facebook_earning,
+            }
+
+            return Response(
+                {"success": True, "status": status.HTTP_200_OK, "data":user_data },
+                status=status.HTTP_200_OK,
+            )
+
+        except MyException as e:
+            return Response(
+                {"error": str(e), "status": e.status}
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e), "status": status.HTTP_500_INTERNAL_SERVER_ERROR}
+            )
