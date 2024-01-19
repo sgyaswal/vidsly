@@ -709,8 +709,6 @@ class GetAllEarningsAPIView(generics.RetrieveAPIView):
         try:
             user = request.user
 
-            print(user.id)
-
             user_data = PageInfo.objects.filter(user_id=user.id).first()
 
             if not user_data:
