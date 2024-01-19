@@ -138,6 +138,7 @@ class LoginAPIView(generics.CreateAPIView):
                     "success": True,
                     "status": status.HTTP_200_OK,
                     "data": {
+                        "user_id":user.id,
                         "token": access_token,
                         "first_name": user.first_name,
                         "last_name": user.last_name,
