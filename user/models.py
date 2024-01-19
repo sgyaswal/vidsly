@@ -23,6 +23,11 @@ class PageInfo(BaseFields):
     user_id  = models.IntegerField(null=False)
     page_access_token = models.CharField(max_length=500, null=False)
     page_id = models.CharField(max_length=255, null=False)
+    facebook_earning = models.CharField(max_length=255)
+    instagram_earning = models.CharField(max_length=255)
+    snapchat_earning = models.CharField(max_length=255)
+    youtube_earning = models.CharField(max_length=255)
+
 
     class Meta:
         managed = False

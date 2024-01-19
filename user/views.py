@@ -605,3 +605,46 @@ class UploadProfilePictureAPIView(generics.CreateAPIView):
             return Response({'error':'AWS credentials not available', 'status': status.HTTP_500_INTERNAL_SERVER_ERROR}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except MyException as e:
             return Response({'error': str(e), 'status': e.status}, status=e.status)
+        
+
+class UpdateEarningAPIView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        tags=["User"],
+        # request_body=UpdateProfileSerializer,
+        # manual_parameters=[Authorization],
+    )
+    def post(self, request):
+        try:
+            user = self.request.user
+
+            update_data = {}
+            if "page_access_token" in request.data:
+                update_data["page_access_token"] = request.data["page_access_token"]
+            if "page_id" in request.data:
+                update_data["page_id"] = request.data["page_id"]
+            if "snapchat_earning" in request.data:
+                update_data["snapchat_earning"] = request.data["snapchat_earning"]
+            if "instagram_earning" in request.data:
+                update_data["instagram_earning"] = request.data["instagram_earning"]
+            if "facebook_earning" in request.data:
+                update_data["facebook_earning"] = request.data["facebook_earning"]
+            if "youtube_earning" in request.data:
+                update_data["youtube_earning"] = request.data["youtube_earning"]
+
+
+            user_details = PageInfo.objects.filter(user_id=user.id)
+
+            if not user_details.exists():
+                PageInfo.objects.create(user_id=user.id, **update_data)
+            else:
+                user_details.update(**update_data)
+
+            return Response(
+                {"success": True, "message": "Earnings updated successfully"},
+                status=status.HTTP_200_OK,
+            )
+
+        except MyException as e:
+            return Response({"error": str(e), "status": e.status}, status=e.status)

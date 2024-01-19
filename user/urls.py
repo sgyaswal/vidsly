@@ -12,7 +12,8 @@ from .views import (
     GetVideoRevenue,
     GetLatestVideo,
     UpdateProfileAPIView,
-    UploadProfilePictureAPIView
+    UploadProfilePictureAPIView,
+    UpdateEarningAPIView
 )
 
 urlpatterns = [
@@ -35,4 +36,5 @@ urlpatterns = [
     path("getlateastVideo", GetLatestVideo.as_view(), name="get-LateastVideo"),
     path("updateProfile", UpdateProfileAPIView.as_view(), name="update-profile"),
     path("updateProfilePicture", UploadProfilePictureAPIView.as_view(), name="update-profile-Picture"),
+    path("updateEarning", UpdateEarningAPIView.as_view(), name="update-earning"),
 ]
