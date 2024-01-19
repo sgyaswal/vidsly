@@ -560,11 +560,14 @@ class GetUserDetailsAPIView(generics.RetrieveAPIView):
 
     def get(self, request):
         try:
-            user = request.user
+            user_id = request.query_params.get('user_id')
 
-            user_data = User.objects.filter(id=user.id).first()
+            if not user_id:
+                raise MyException("Please Provide user Id",500)
 
-            user_details_instance = UserDetails.objects.filter(user_id=user.id).first()
+            user_data = User.objects.filter(id=user_id).first()
+
+            user_details_instance = UserDetails.objects.filter(user_id=user_id).first()
 
             user_details_data = {}
 
@@ -670,7 +673,10 @@ class UpdateEarningAPIView(generics.CreateAPIView):
     )
     def post(self, request):
         try:
-            user = self.request.user
+            user_id = request.data.get('user_id')
+
+            if not user_id:
+                raise MyException("Please Provide user Id",500)
 
             update_data = {}
             if "page_access_token" in request.data:
@@ -687,10 +693,10 @@ class UpdateEarningAPIView(generics.CreateAPIView):
                 update_data["youtube_earning"] = request.data["youtube_earning"]
 
 
-            user_details = PageInfo.objects.filter(user_id=user.id)
+            user_details = PageInfo.objects.filter(user_id=user_id)
 
             if not user_details.exists():
-                PageInfo.objects.create(user_id=user.id, **update_data)
+                PageInfo.objects.create(user_id=user_id, **update_data)
             else:
                 user_details.update(**update_data)
 
@@ -710,9 +716,12 @@ class GetAllEarningsAPIView(generics.RetrieveAPIView):
 
     def get(self, request):
         try:
-            user = request.user
+            user_id = request.query_params.get('user_id')
 
-            user_data = PageInfo.objects.filter(user_id=user.id).first()
+            if not user_id:
+                raise MyException("Please Provide user Id",500)
+
+            user_data = PageInfo.objects.filter(user_id=user_id).first()
 
             if not user_data:
                 raise MyException("Page Information Not Found", 404)
