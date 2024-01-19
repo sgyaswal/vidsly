@@ -421,13 +421,15 @@ class GetVideoRevenue(APIView):
                         get_total_ad_earnings(video_id)
                         for video_id in latest_20_video_ids
                     )
-                    
-                    user_details = PageInfo.objects.filter(user_id=user_id)
 
-                    if not user_details.exists():
-                        PageInfo.objects.create(user_id=user_id, facebook_earning=total_sum)
+                    page_info = PageInfo.objects.filter(user_id=user_id)
+
+                    update_data = {"facebook_earning":total_sum}
+
+                    if not page_info.exists():
+                        PageInfo.objects.create(user_id=user_id, **update_data)
                     else:
-                        user_details.update({"facebook_earning":total_sum})
+                        page_info.update(**update_data)
 
                     return Response(
                         {
