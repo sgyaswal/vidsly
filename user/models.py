@@ -40,6 +40,7 @@ class UserDetails(BaseFields):
     image_url = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
+    mobile_number = models.CharField(max_length=20)
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     country = models.CharField(max_length=255)

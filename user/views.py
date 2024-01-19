@@ -523,6 +523,8 @@ class UpdateProfileAPIView(generics.CreateAPIView):
 
             # Update data for UserDetails model
             update_data_user_details = {}
+            if "mobile_number" in request.data:
+                update_data_user_details["mobile_number"] = request.data["mobile_number"]
             if "address" in request.data:
                 update_data_user_details["address"] = request.data["address"]
             if "city" in request.data:
@@ -569,6 +571,7 @@ class GetUserDetailsAPIView(generics.RetrieveAPIView):
             if  user_details_instance:
                 user_details_data = {
                 "user_id": user_details_instance.user_id,
+                "mobile_number":user_details_instance.mobile_number,
                 "address": user_details_instance.address,
                 "city": user_details_instance.city,
                 "state": user_details_instance.state,
