@@ -14,6 +14,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
 
+from decouple import config
+
+DEBUG = config('DEBUG', default=False, cast=bool)
+# SECRET_KEY = config('AWS_ACCESS_KEY_ID')
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,21 +29,36 @@ import os
 envs = os.environ
 
 LOG_DELETION=envs.get('LOG_DELETION_DAY', 15)
-HOST=envs.get("HOST_SERVER_URL",'http://localhost:8000')
-DJANGO_DATABASE_NAME= envs.get('DJANGO_DATABASE_NAME', '')
-DJANGO_DATABASE_USER=  envs.get('DJANGO_DATABASE_USER', '')
-DJANGO_DATABASE_PASSWORD= envs.get('DJANGO_DATABASE_PASSWORD', '')
-DJANGO_DATABASE_SERVER=  envs.get('DJANGO_DATABASE_SERVER', '')
+# HOST=envs.get("HOST_SERVER_URL",'http://localhost:8000')
+# DJANGO_DATABASE_NAME= envs.get('DJANGO_DATABASE_NAME', '')
+# DJANGO_DATABASE_USER=  envs.get('DJANGO_DATABASE_USER', '')
+# DJANGO_DATABASE_PASSWORD= envs.get('DJANGO_DATABASE_PASSWORD', '')
+# DJANGO_DATABASE_SERVER=  envs.get('DJANGO_DATABASE_SERVER', '')
 
 
-AWS_SES_REGION_NAME = envs.get('AWS_SES_REGION_NAME','')
-AWS_ACCESS_KEY_ID = envs.get('AWS_ACCESS_KEY_ID','')
-AWS_SECRET_ACCESS_KEY= envs.get('AWS_SECRET_ACCESS_KEY','')
-AWS_SES_VERIFY_EMAIL=envs.get('AWS_SES_VERIFY_EMAIL','')
-AWS_STORAGE_BUCKET_NAME = envs.get('AWS_STORAGE_BUCKET_NAME','')
+# AWS_SES_REGION_NAME = envs.get('AWS_SES_REGION_NAME','')
+# AWS_ACCESS_KEY_ID = envs.get('AWS_ACCESS_KEY_ID','')
+# AWS_SECRET_ACCESS_KEY= envs.get('AWS_SECRET_ACCESS_KEY','')
+# AWS_SES_VERIFY_EMAIL=envs.get('AWS_SES_VERIFY_EMAIL','')
+# AWS_STORAGE_BUCKET_NAME = envs.get('AWS_STORAGE_BUCKET_NAME','')
 AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_SECURE_URLS = True
+
+
+HOST=config("HOST_SERVER_URL",'http://localhost:8000')
+DJANGO_DATABASE_NAME= config('DJANGO_DATABASE_NAME', '')
+DJANGO_DATABASE_USER=  config('DJANGO_DATABASE_USER', '')
+DJANGO_DATABASE_PASSWORD= config('DJANGO_DATABASE_PASSWORD', '')
+DJANGO_DATABASE_SERVER=  config('DJANGO_DATABASE_SERVER', '')
+
+
+AWS_SES_REGION_NAME = config('AWS_SES_REGION_NAME','')
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID','')
+AWS_SECRET_ACCESS_KEY= config('AWS_SECRET_ACCESS_KEY','')
+AWS_SES_VERIFY_EMAIL=config('AWS_SES_VERIFY_EMAIL','')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME','')
+
 
 
 # Quick-start development settings - unsuitable for production
