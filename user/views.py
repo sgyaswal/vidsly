@@ -32,9 +32,6 @@ import requests
 from rest_framework.parsers import MultiPartParser, FormParser
 import boto3
 from botocore.exceptions import NoCredentialsError
-from django.core.exceptions import ValidationError
-from django.core.validators import FileExtensionValidator, MaxValueValidator
-
 
 import os
 
@@ -131,6 +128,22 @@ class LoginAPIView(generics.CreateAPIView):
             access_token_payload = refresh.access_token.payload
             access_token_payload["userId"] = user.id
 
+            user_detail_data = {}
+            user_details = UserDetails.objects.filter(user_id=user.id).first()
+            if not user_details:
+                user_detail_data = {}
+            else:
+                user_detail_data = {
+                    "image_url": user_details.image_url,
+                    "category": user_details.category,
+                    "address":user_details.address,
+                    "mobile_number":user_details.mobile_number,
+                    "city":user_details.city,
+                    "state":user_details.state,
+                    "country":user_details.country,
+                    "pincode":user_details.pincode,
+                }
+
             return Response(
                 {
                     "success": True,
@@ -143,6 +156,7 @@ class LoginAPIView(generics.CreateAPIView):
                         "username": user.username,
                         "email": user.email,
                         "is_staff": user.is_staff,
+                        **user_detail_data
                     },
                 }
             )
@@ -580,6 +594,7 @@ class GetUserDetailsAPIView(generics.RetrieveAPIView):
 
             if user_details_instance:
                 user_details_data = {
+                    "image_url":user_details_instance.image_url,
                     "user_id": user_details_instance.user_id,
                     "mobile_number": user_details_instance.mobile_number,
                     "address": user_details_instance.address,
