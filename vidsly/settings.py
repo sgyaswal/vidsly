@@ -59,6 +59,8 @@ AWS_SECRET_ACCESS_KEY= config('AWS_SECRET_ACCESS_KEY','')
 AWS_SES_VERIFY_EMAIL=config('AWS_SES_VERIFY_EMAIL','')
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME','')
 
+print(AWS_ACCESS_KEY_ID)
+
 
 
 # Quick-start development settings - unsuitable for production
